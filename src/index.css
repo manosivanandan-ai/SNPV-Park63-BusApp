@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  /* Pastel palette */
+  --color-lavender-50: #f7f5ff;
+  --color-lavender-100: #efeaff;
+  --color-lavender-200: #ddd3ff;
+  --color-lavender-300: #c4b3fd;
+  --color-lavender-400: #a58ef8;
+  --color-lavender-500: #8b6bf0;
+  --color-lavender-600: #7350d9;
+
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #dff3ff;
+  --color-sky-200: #b9e6ff;
+  --color-sky-300: #86d4ff;
+  --color-sky-400: #55bdf7;
+  --color-sky-500: #2fa3e8;
+  --color-sky-600: #2185c4;
+
+  --color-mint-50: #f0fdf7;
+  --color-mint-100: #dcfbec;
+  --color-mint-200: #b6f4d6;
+  --color-mint-300: #85e8b8;
+  --color-mint-400: #52d495;
+  --color-mint-500: #2fbb79;
+  --color-mint-600: #229a63;
+
+  --color-peach-50: #fff7f0;
+  --color-peach-100: #ffecdb;
+  --color-peach-200: #ffd6b3;
+  --color-peach-300: #ffbc85;
+  --color-peach-400: #ff9d57;
+  --color-peach-500: #f97f36;
+  --color-peach-600: #dd6323;
+
+  --font-sans: "Nunito", system-ui, sans-serif;
+  --font-heading: "Quicksand", system-ui, sans-serif;
+
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2.25rem;
+
+  --shadow-soft: 0 2px 8px -2px rgba(139, 107, 240, 0.12), 0 8px 24px -8px rgba(139, 107, 240, 0.1);
+  --shadow-softer: 0 1px 3px rgba(107, 99, 128, 0.06), 0 4px 12px -4px rgba(107, 99, 128, 0.08);
+  --shadow-glow: 0 8px 30px -6px rgba(139, 107, 240, 0.25);
+
+  --animate-pop: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.03);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-3deg);
+    }
+    75% {
+      transform: rotate(3deg);
+    }
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--font-sans);
+  background: linear-gradient(180deg, #faf8ff 0%, #f4f9ff 45%, #fdf6f0 100%);
+  background-attachment: fixed;
+  color: #3f3a4a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-lavender-200);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
