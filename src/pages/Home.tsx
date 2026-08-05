@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Bus, Users2 } from "lucide-react";
+import { Plus, Bus, Users2, RotateCcw } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BusStatusBanner, BusStatusCard } from "@/components/BusStatus";
 import { DriverCard } from "@/components/DriverCard";
@@ -8,6 +8,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { PhaseBoard } from "@/components/PhaseBoard";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import { ManageRosterDialog } from "@/components/ManageRosterDialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { useStudents } from "@/hooks/useStudents";
 import { useDriver } from "@/hooks/useDriver";
@@ -15,7 +16,7 @@ import { useBusStatus } from "@/hooks/useBusStatus";
 import type { Phase } from "@/types";
 
 export default function Home() {
-  const { students, loaded, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport } =
+  const { students, loaded, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport, resetAttendance } =
     useStudents();
   const { driver, setDriver } = useDriver();
   const { status, setStatus } = useBusStatus();
@@ -23,6 +24,7 @@ export default function Home() {
   const [tab, setTab] = useState<Phase>("phase1");
   const [addOpen, setAddOpen] = useState(false);
   const [rosterOpen, setRosterOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
 
   if (!loaded) {
     return (
@@ -56,15 +58,26 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-sm text-slate-400">Keep every little rider safe & accounted for</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-2 gap-1.5 text-xs"
-            onClick={() => setRosterOpen(true)}
-          >
-            <Users2 className="h-3.5 w-3.5" />
-            Manage Roster
-          </Button>
+          <div className="mt-2 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs"
+              onClick={() => setRosterOpen(true)}
+            >
+              <Users2 className="h-3.5 w-3.5" />
+              Manage Roster
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs text-peach-600 border-peach-200 hover:bg-peach-50"
+              onClick={() => setResetOpen(true)}
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              New Day
+            </Button>
+          </div>
         </header>
 
         <Dashboard total={students.length} boarded={totalBoarded} />
@@ -121,6 +134,18 @@ export default function Home() {
       <AddStudentDialog open={addOpen} onOpenChange={setAddOpen} defaultPhase={tab} onAdd={addStudent} />
 
       <ManageRosterDialog open={rosterOpen} onOpenChange={setRosterOpen} onImport={bulkImport} />
+
+      <ConfirmDialog
+        open={resetOpen}
+        onOpenChange={setResetOpen}
+        title="Start a new day?"
+        description="This will mark all children as Not Boarded and reset the bus to Phase 1. Their names stay — only attendance is cleared."
+        confirmLabel="Reset Attendance"
+        onConfirm={() => {
+          resetAttendance();
+          setStatus("phase1");
+        }}
+      />
 
       <footer className="mt-10 flex items-center justify-center gap-1.5 pb-4 text-xs text-slate-300">
         <Bus className="h-3.5 w-3.5" />

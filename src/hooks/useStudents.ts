@@ -79,6 +79,10 @@ export function useStudents() {
     [persist]
   );
 
+  const resetAttendance = useCallback(() => {
+    persist(ref.current.map((s) => ({ ...s, boarded: false })));
+  }, [persist]);
+
   const bulkImport = useCallback(
     (phase1Names: string[], phase2Names: string[], replace: boolean) => {
       const make = (name: string, phase: Phase): Student => ({
@@ -96,5 +100,5 @@ export function useStudents() {
     [persist]
   );
 
-  return { students, loaded, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport };
+  return { students, loaded, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport, resetAttendance };
 }
