@@ -1,60 +1,87 @@
-import { useCallback } from "react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { INITIAL_STUDENTS } from "@/data/initialData";
 import type { Phase, Student } from "@/types";
 
-const STORAGE_KEY = "bus-tracker:students-v2";
+const REF = doc(db, "config", "students");
 
 export function useStudents() {
-  const [students, setStudents] = useLocalStorage<Student[]>(STORAGE_KEY, INITIAL_STUDENTS);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const ref = useRef<Student[]>([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(REF, (snap) => {
+      if (snap.exists()) {
+        const list = snap.data().list as Student[];
+        ref.current = list;
+        setStudents(list);
+      } else {
+        ref.current = INITIAL_STUDENTS;
+        setDoc(REF, { list: INITIAL_STUDENTS });
+      }
+      setLoaded(true);
+    });
+    return unsub;
+  }, []);
+
+  const persist = useCallback((list: Student[]) => {
+    ref.current = list;
+    setStudents(list);
+    setDoc(REF, { list });
+  }, []);
 
   const addStudent = useCallback(
     (name: string, phase: Phase) => {
       const trimmed = name.trim();
       if (!trimmed) return;
-      setStudents((prev) => [
-        ...prev,
-        { id: `student-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name: trimmed, phase, boarded: false },
+      persist([
+        ...ref.current,
+        {
+          id: `student-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          name: trimmed,
+          phase,
+          boarded: false,
+        },
       ]);
     },
-    [setStudents]
+    [persist]
   );
 
   const toggleBoarded = useCallback(
     (id: string) => {
-      setStudents((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, boarded: !s.boarded } : s))
-      );
+      persist(ref.current.map((s) => (s.id === id ? { ...s, boarded: !s.boarded } : s)));
     },
-    [setStudents]
+    [persist]
   );
 
   const renameStudent = useCallback(
     (id: string, name: string) => {
       const trimmed = name.trim();
       if (!trimmed) return;
-      setStudents((prev) => prev.map((s) => (s.id === id ? { ...s, name: trimmed } : s)));
+      persist(ref.current.map((s) => (s.id === id ? { ...s, name: trimmed } : s)));
     },
-    [setStudents]
+    [persist]
   );
 
   const moveStudent = useCallback(
     (id: string, phase: Phase) => {
-      setStudents((prev) => prev.map((s) => (s.id === id ? { ...s, phase } : s)));
+      persist(ref.current.map((s) => (s.id === id ? { ...s, phase } : s)));
     },
-    [setStudents]
+    [persist]
   );
 
   const deleteStudent = useCallback(
     (id: string) => {
-      setStudents((prev) => prev.filter((s) => s.id !== id));
+      persist(ref.current.filter((s) => s.id !== id));
     },
-    [setStudents]
+    [persist]
   );
 
   const bulkImport = useCallback(
     (phase1Names: string[], phase2Names: string[], replace: boolean) => {
-      const make = (name: string, phase: Phase) => ({
+      const make = (name: string, phase: Phase): Student => ({
         id: `student-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         name,
         phase,
@@ -64,10 +91,10 @@ export function useStudents() {
         ...phase1Names.map((n) => make(n, "phase1")),
         ...phase2Names.map((n) => make(n, "phase2")),
       ];
-      setStudents((prev) => (replace ? incoming : [...prev, ...incoming]));
+      persist(replace ? incoming : [...ref.current, ...incoming]);
     },
-    [setStudents]
+    [persist]
   );
 
-  return { students, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport };
+  return { students, loaded, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport };
 }

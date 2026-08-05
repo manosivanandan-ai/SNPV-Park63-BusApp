@@ -47,10 +47,10 @@ export function DriverCard({ driver, onSave }: DriverCardProps) {
           {editing ? (
             <motion.div
               key="edit"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="flex flex-col gap-3 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col gap-3"
             >
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="driver-name">Driver Name</Label>

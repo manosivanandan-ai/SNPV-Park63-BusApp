@@ -15,7 +15,7 @@ import { useBusStatus } from "@/hooks/useBusStatus";
 import type { Phase } from "@/types";
 
 export default function Home() {
-  const { students, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport } =
+  const { students, loaded, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport } =
     useStudents();
   const { driver, setDriver } = useDriver();
   const { status, setStatus } = useBusStatus();
@@ -23,6 +23,14 @@ export default function Home() {
   const [tab, setTab] = useState<Phase>("phase1");
   const [addOpen, setAddOpen] = useState(false);
   const [rosterOpen, setRosterOpen] = useState(false);
+
+  if (!loaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-slate-400 text-sm font-semibold animate-pulse">Loading roster…</p>
+      </div>
+    );
+  }
 
   const phase1Students = students.filter((s) => s.phase === "phase1");
   const phase2Students = students.filter((s) => s.phase === "phase2");
