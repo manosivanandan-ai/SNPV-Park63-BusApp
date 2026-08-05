@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Bus } from "lucide-react";
+import { Plus, Bus, Users2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BusStatusBanner, BusStatusCard } from "@/components/BusStatus";
 import { DriverCard } from "@/components/DriverCard";
 import { Dashboard } from "@/components/Dashboard";
 import { PhaseBoard } from "@/components/PhaseBoard";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
+import { ManageRosterDialog } from "@/components/ManageRosterDialog";
 import { Button } from "@/components/ui/button";
 import { useStudents } from "@/hooks/useStudents";
 import { useDriver } from "@/hooks/useDriver";
@@ -14,13 +15,14 @@ import { useBusStatus } from "@/hooks/useBusStatus";
 import type { Phase } from "@/types";
 
 export default function Home() {
-  const { students, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent } =
+  const { students, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport } =
     useStudents();
   const { driver, setDriver } = useDriver();
   const { status, setStatus } = useBusStatus();
 
   const [tab, setTab] = useState<Phase>("phase1");
   const [addOpen, setAddOpen] = useState(false);
+  const [rosterOpen, setRosterOpen] = useState(false);
 
   const phase1Students = students.filter((s) => s.phase === "phase1");
   const phase2Students = students.filter((s) => s.phase === "phase2");
@@ -46,6 +48,15 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-sm text-slate-400">Keep every little rider safe & accounted for</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2 gap-1.5 text-xs"
+            onClick={() => setRosterOpen(true)}
+          >
+            <Users2 className="h-3.5 w-3.5" />
+            Manage Roster
+          </Button>
         </header>
 
         <Dashboard total={students.length} boarded={totalBoarded} />
@@ -100,6 +111,8 @@ export default function Home() {
       </motion.div>
 
       <AddStudentDialog open={addOpen} onOpenChange={setAddOpen} defaultPhase={tab} onAdd={addStudent} />
+
+      <ManageRosterDialog open={rosterOpen} onOpenChange={setRosterOpen} onImport={bulkImport} />
 
       <footer className="mt-10 flex items-center justify-center gap-1.5 pb-4 text-xs text-slate-300">
         <Bus className="h-3.5 w-3.5" />

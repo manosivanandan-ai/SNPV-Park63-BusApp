@@ -3,7 +3,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { INITIAL_STUDENTS } from "@/data/initialData";
 import type { Phase, Student } from "@/types";
 
-const STORAGE_KEY = "bus-tracker:students";
+const STORAGE_KEY = "bus-tracker:students-v2";
 
 export function useStudents() {
   const [students, setStudents] = useLocalStorage<Student[]>(STORAGE_KEY, INITIAL_STUDENTS);
@@ -52,5 +52,22 @@ export function useStudents() {
     [setStudents]
   );
 
-  return { students, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent };
+  const bulkImport = useCallback(
+    (phase1Names: string[], phase2Names: string[], replace: boolean) => {
+      const make = (name: string, phase: Phase) => ({
+        id: `student-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name,
+        phase,
+        boarded: false,
+      });
+      const incoming = [
+        ...phase1Names.map((n) => make(n, "phase1")),
+        ...phase2Names.map((n) => make(n, "phase2")),
+      ];
+      setStudents((prev) => (replace ? incoming : [...prev, ...incoming]));
+    },
+    [setStudents]
+  );
+
+  return { students, addStudent, toggleBoarded, renameStudent, moveStudent, deleteStudent, bulkImport };
 }

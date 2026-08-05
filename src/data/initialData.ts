@@ -4,12 +4,43 @@ let idCounter = 0;
 const nextId = () => `student-${Date.now()}-${idCounter++}`;
 
 export const INITIAL_STUDENTS: Student[] = [
-  ...["Rithvik", "Vihaan", "Aadhya", "Thukil Oviyan"].map(
-    (name): Student => ({ id: nextId(), name, phase: "phase1", boarded: false })
-  ),
-  ...["Kirtanyaa", "Humsiha", "Tanmayaa", "Sandhyaa"].map(
-    (name): Student => ({ id: nextId(), name, phase: "phase2", boarded: false })
-  ),
+  ...[
+    "Vihaan.G",
+    "Rithvik.G",
+    "Aadhya",
+    "Yashashwini",
+    "Vibodh",
+    "ThukilOviyan",
+    "Sarvesh",
+    "Lakshaya",
+    "Varshitha",
+    "Aadhvika",
+    "Rithvin",
+    "Neelesh",
+  ].map((name): Student => ({ id: nextId(), name, phase: "phase1", boarded: false })),
+  ...[
+    "Kirtanyaa",
+    "Yokshita",
+    "Magizhnan",
+    "Navilnan",
+    "Tanmaya",
+    "Siddharth Nair",
+    "Ayush",
+    "Shravya",
+    "Humsiha",
+    "Sandhya",
+    "Ilakkiya A",
+    "Riddhan",
+    "Cholamithran",
+    "Cholavarman",
+    "Arjun",
+    "Dharmik",
+    "Tara",
+    "Nila G",
+    "Kavishree",
+    "Niranjan",
+    "Anvika Shree",
+  ].map((name): Student => ({ id: nextId(), name, phase: "phase2", boarded: false })),
 ];
 
 export const INITIAL_DRIVER: Driver = {
