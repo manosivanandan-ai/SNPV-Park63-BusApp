@@ -48,7 +48,7 @@ export const INITIAL_DRIVER: Driver = {
   phone: "9876543210",
 };
 
-export const INITIAL_BUS_STATUS: BusStatusValue = "phase1";
+export const INITIAL_BUS_STATUS: BusStatusValue = "phase2";
 
 export const BUS_STATUS_OPTIONS: BusStatusOption[] = [
   {

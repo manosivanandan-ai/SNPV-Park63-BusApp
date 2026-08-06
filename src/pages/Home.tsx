@@ -21,7 +21,7 @@ export default function Home() {
   const { driver, setDriver } = useDriver();
   const { status, setStatus } = useBusStatus();
 
-  const [tab, setTab] = useState<Phase>("phase1");
+  const [tab, setTab] = useState<Phase>("phase2");
   const [addOpen, setAddOpen] = useState(false);
   const [rosterOpen, setRosterOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
@@ -88,24 +88,24 @@ export default function Home() {
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as Phase)} className="flex flex-col">
           <TabsList className="w-full">
-            <TabsTrigger value="phase1">Phase 1</TabsTrigger>
             <TabsTrigger value="phase2">Phase 2</TabsTrigger>
+            <TabsTrigger value="phase1">Phase 1</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="phase1">
+          <TabsContent value="phase2">
             <PhaseBoard
-              phase="phase1"
-              students={phase1Students}
+              phase="phase2"
+              students={phase2Students}
               onToggleBoarded={toggleBoarded}
               onRename={renameStudent}
               onMove={moveStudent}
               onDelete={deleteStudent}
             />
           </TabsContent>
-          <TabsContent value="phase2">
+          <TabsContent value="phase1">
             <PhaseBoard
-              phase="phase2"
-              students={phase2Students}
+              phase="phase1"
+              students={phase1Students}
               onToggleBoarded={toggleBoarded}
               onRename={renameStudent}
               onMove={moveStudent}
@@ -139,11 +139,11 @@ export default function Home() {
         open={resetOpen}
         onOpenChange={setResetOpen}
         title="Start a new day?"
-        description="This will mark all children as Not Boarded and reset the bus to Phase 1. Their names stay — only attendance is cleared."
+        description="This will mark all children as Not Boarded and reset the bus to Phase 2. Their names stay — only attendance is cleared."
         confirmLabel="Reset Attendance"
         onConfirm={() => {
           resetAttendance();
-          setStatus("phase1");
+          setStatus("phase2");
         }}
       />
 
