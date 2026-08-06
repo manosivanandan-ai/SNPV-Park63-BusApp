@@ -5,6 +5,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { StudentCard } from "@/components/StudentCard";
 import { Summary } from "@/components/Summary";
 import { fireConfetti } from "@/utils/confetti";
+import { cn } from "@/utils/cn";
 import type { Phase, Student } from "@/types";
 
 interface PhaseBoardProps {
@@ -14,9 +15,10 @@ interface PhaseBoardProps {
   onRename: (id: string, name: string) => void;
   onMove: (id: string, phase: Phase) => void;
   onDelete: (id: string) => void;
+  isReadOnly?: boolean;
 }
 
-export function PhaseBoard({ students, onToggleBoarded, onRename, onMove, onDelete }: PhaseBoardProps) {
+export function PhaseBoard({ students, onToggleBoarded, onRename, onMove, onDelete, isReadOnly }: PhaseBoardProps) {
   const [query, setQuery] = useState("");
   const [flashedId, setFlashedId] = useState<string | null>(null);
   const celebratedRef = useRef(false);
@@ -55,7 +57,7 @@ export function PhaseBoard({ students, onToggleBoarded, onRename, onMove, onDele
       {/* Quick-tap chips — tap a name to mark as boarded */}
       <div className="rounded-3xl border-2 border-peach-100 bg-peach-50/60 p-4">
         <p className="mb-3 text-xs font-bold uppercase tracking-widest text-peach-400">
-          Tap to mark as boarded
+          {isReadOnly ? "Not yet boarded" : "Tap to mark as boarded"}
         </p>
         {unboarded.length === 0 ? (
           <p className="text-sm font-semibold text-mint-600">🎉 Everyone has boarded!</p>
@@ -74,8 +76,14 @@ export function PhaseBoard({ students, onToggleBoarded, onRename, onMove, onDele
                   }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
-                  onClick={() => handleChipTap(s.id)}
-                  className="rounded-full bg-white border-2 border-peach-200 px-3 py-1.5 text-sm font-semibold text-slate-600 shadow-sm hover:border-mint-300 hover:bg-mint-50 hover:text-mint-700 active:scale-95 transition-colors"
+                  onClick={() => !isReadOnly && handleChipTap(s.id)}
+                  disabled={isReadOnly}
+                  className={cn(
+                    "rounded-full bg-white border-2 border-peach-200 px-3 py-1.5 text-sm font-semibold text-slate-600 shadow-sm transition-colors",
+                    isReadOnly
+                      ? "cursor-default opacity-80"
+                      : "hover:border-mint-300 hover:bg-mint-50 hover:text-mint-700 active:scale-95"
+                  )}
                 >
                   {s.name}
                 </motion.button>
@@ -121,6 +129,7 @@ export function PhaseBoard({ students, onToggleBoarded, onRename, onMove, onDele
                 onRename={onRename}
                 onMove={onMove}
                 onDelete={onDelete}
+                isReadOnly={isReadOnly}
               />
             ))
           )}
