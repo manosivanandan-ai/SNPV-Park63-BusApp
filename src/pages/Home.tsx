@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Bus, Users2, RotateCcw } from "lucide-react";
+import { Plus, Bus, Users2, RotateCcw, Lock } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BusStatusBanner, BusStatusCard } from "@/components/BusStatus";
 import { DriverCard } from "@/components/DriverCard";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useStudents } from "@/hooks/useStudents";
 import { useDriver } from "@/hooks/useDriver";
 import { useBusStatus } from "@/hooks/useBusStatus";
+import { useSessionLock } from "@/hooks/useSessionLock";
 import type { Phase } from "@/types";
 
 export default function Home() {
@@ -20,6 +21,9 @@ export default function Home() {
     useStudents();
   const { driver, setDriver } = useDriver();
   const { status, setStatus } = useBusStatus();
+  const { lockedByOther, expiredByOther, takeControl } = useSessionLock();
+
+  const isReadOnly = lockedByOther;
 
   const [tab, setTab] = useState<Phase>("phase2");
   const [addOpen, setAddOpen] = useState(false);
@@ -42,6 +46,25 @@ export default function Home() {
     <div className="min-h-screen pb-28">
       <BusStatusBanner status={status} />
 
+      {/* Session lock banner */}
+      {(lockedByOther || expiredByOther) && (
+        <div className="flex items-center justify-between gap-3 bg-peach-50 px-4 py-2.5 border-b border-peach-200">
+          <div className="flex items-center gap-2 min-w-0">
+            <Lock className="h-4 w-4 shrink-0 text-peach-500" />
+            <p className="truncate text-sm font-semibold text-peach-700">
+              {lockedByOther
+                ? "Another device is using the app — editing paused"
+                : "Previous session expired"}
+            </p>
+          </div>
+          {expiredByOther && (
+            <Button size="sm" variant="outline" className="shrink-0 text-xs" onClick={takeControl}>
+              Take control
+            </Button>
+          )}
+        </div>
+      )}
+
       <main className="mx-auto flex max-w-3xl flex-col gap-5 px-4 pt-5 sm:px-6">
         <header className="flex flex-col items-center gap-1 text-center">
           <div className="flex items-center gap-2">
@@ -58,33 +81,35 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-sm text-slate-400">Keep every little rider safe & accounted for</p>
-          <div className="mt-2 flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-xs"
-              onClick={() => setRosterOpen(true)}
-            >
-              <Users2 className="h-3.5 w-3.5" />
-              Manage Roster
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-xs text-peach-600 border-peach-200 hover:bg-peach-50"
-              onClick={() => setResetOpen(true)}
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              New Day
-            </Button>
-          </div>
+          {!isReadOnly && (
+            <div className="mt-2 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => setRosterOpen(true)}
+              >
+                <Users2 className="h-3.5 w-3.5" />
+                Manage Roster
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs text-peach-600 border-peach-200 hover:bg-peach-50"
+                onClick={() => setResetOpen(true)}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                New Day
+              </Button>
+            </div>
+          )}
         </header>
 
         <Dashboard total={students.length} boarded={totalBoarded} />
 
-        <BusStatusCard status={status} onChange={setStatus} />
+        <BusStatusCard status={status} onChange={setStatus} isReadOnly={isReadOnly} />
 
-        <DriverCard driver={driver} onSave={setDriver} />
+        <DriverCard driver={driver} onSave={setDriver} isReadOnly={isReadOnly} />
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as Phase)} className="flex flex-col">
           <TabsList className="w-full">
@@ -100,6 +125,7 @@ export default function Home() {
               onRename={renameStudent}
               onMove={moveStudent}
               onDelete={deleteStudent}
+              isReadOnly={isReadOnly}
             />
           </TabsContent>
           <TabsContent value="phase1">
@@ -110,26 +136,29 @@ export default function Home() {
               onRename={renameStudent}
               onMove={moveStudent}
               onDelete={deleteStudent}
+              isReadOnly={isReadOnly}
             />
           </TabsContent>
         </Tabs>
       </main>
 
-      <motion.div
-        className="fixed bottom-6 right-6 z-40"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.3 }}
-      >
-        <Button
-          size="fab"
-          onClick={() => setAddOpen(true)}
-          aria-label="Add student"
-          className="shadow-glow"
+      {!isReadOnly && (
+        <motion.div
+          className="fixed bottom-6 right-6 z-40"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.3 }}
         >
-          <Plus className="h-7 w-7" strokeWidth={2.5} />
-        </Button>
-      </motion.div>
+          <Button
+            size="fab"
+            onClick={() => setAddOpen(true)}
+            aria-label="Add student"
+            className="shadow-glow"
+          >
+            <Plus className="h-7 w-7" strokeWidth={2.5} />
+          </Button>
+        </motion.div>
+      )}
 
       <AddStudentDialog open={addOpen} onOpenChange={setAddOpen} defaultPhase={tab} onAdd={addStudent} />
 

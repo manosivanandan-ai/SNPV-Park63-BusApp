@@ -10,9 +10,10 @@ import type { Driver } from "@/types";
 interface DriverCardProps {
   driver: Driver;
   onSave: (driver: Driver) => void;
+  isReadOnly?: boolean;
 }
 
-export function DriverCard({ driver, onSave }: DriverCardProps) {
+export function DriverCard({ driver, onSave, isReadOnly }: DriverCardProps) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(driver.name);
   const [phone, setPhone] = useState(driver.phone);
@@ -35,7 +36,7 @@ export function DriverCard({ driver, onSave }: DriverCardProps) {
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle className="flex items-center gap-2">🚍 Driver Information</CardTitle>
-        {!editing && (
+        {!editing && !isReadOnly && (
           <Button size="sm" variant="outline" onClick={startEdit}>
             <Pencil className="h-4 w-4" />
             Edit
