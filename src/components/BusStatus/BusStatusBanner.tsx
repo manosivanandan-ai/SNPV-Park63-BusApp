@@ -19,7 +19,7 @@ export function BusStatusBanner({ status }: { status: BusStatusValue }) {
   const option = BUS_STATUS_OPTIONS.find((o) => o.value === status)!;
 
   return (
-    <div className="sticky top-0 z-30 px-4 pt-4 sm:px-6">
+    <div className="px-4 pt-4 sm:px-6">
       <AnimatePresence mode="wait">
         <motion.div
           key={status}
