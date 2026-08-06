@@ -34,10 +34,9 @@ interface StudentCardProps {
   onRename: (id: string, name: string) => void;
   onMove: (id: string, phase: Student["phase"]) => void;
   onDelete: (id: string) => void;
-  isReadOnly?: boolean;
 }
 
-export function StudentCard({ student, onToggleBoarded, onRename, onMove, onDelete, isReadOnly }: StudentCardProps) {
+export function StudentCard({ student, onToggleBoarded, onRename, onMove, onDelete }: StudentCardProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const otherPhase = student.phase === "phase1" ? "phase2" : "phase1";
@@ -71,49 +70,47 @@ export function StudentCard({ student, onToggleBoarded, onRename, onMove, onDele
             </motion.div>
           </div>
 
-          {!isReadOnly && (
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-              <motion.div whileTap={{ scale: 0.94 }}>
-                <Button
-                  size="sm"
-                  variant={student.boarded ? "outline" : "mint"}
-                  onClick={() => onToggleBoarded(student.id)}
-                  className="whitespace-nowrap"
-                >
-                  {student.boarded ? (
-                    <>
-                      <Undo2 className="h-4 w-4" />
-                      <span className="hidden sm:inline">Undo</span>
-                    </>
-                  ) : (
-                    <span>Mark Present</span>
-                  )}
-                </Button>
-              </motion.div>
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <motion.div whileTap={{ scale: 0.94 }}>
+              <Button
+                size="sm"
+                variant={student.boarded ? "outline" : "mint"}
+                onClick={() => onToggleBoarded(student.id)}
+                className="whitespace-nowrap"
+              >
+                {student.boarded ? (
+                  <>
+                    <Undo2 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Undo</span>
+                  </>
+                ) : (
+                  <span>Mark Present</span>
+                )}
+              </Button>
+            </motion.div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" aria-label="More options">
-                    <MoreVertical className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => setEditOpen(true)}>
-                    <Pencil className="h-4 w-4" />
-                    Edit Name
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => onMove(student.id, otherPhase)}>
-                    <ArrowLeftRight className="h-4 w-4" />
-                    Move to {PHASE_LABEL[otherPhase]}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem destructive onSelect={() => setDeleteOpen(true)}>
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" aria-label="More options">
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                  <Pencil className="h-4 w-4" />
+                  Edit Name
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => onMove(student.id, otherPhase)}>
+                  <ArrowLeftRight className="h-4 w-4" />
+                  Move to {PHASE_LABEL[otherPhase]}
+                </DropdownMenuItem>
+                <DropdownMenuItem destructive onSelect={() => setDeleteOpen(true)}>
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </Card>
       </motion.div>
 

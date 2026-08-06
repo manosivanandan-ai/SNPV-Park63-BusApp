@@ -7,10 +7,9 @@ import { cn } from "@/utils/cn";
 interface BusStatusCardProps {
   status: BusStatusValue;
   onChange: (status: BusStatusValue) => void;
-  isReadOnly?: boolean;
 }
 
-export function BusStatusCard({ status, onChange, isReadOnly }: BusStatusCardProps) {
+export function BusStatusCard({ status, onChange }: BusStatusCardProps) {
   return (
     <Card>
       <CardHeader>
@@ -24,13 +23,11 @@ export function BusStatusCard({ status, onChange, isReadOnly }: BusStatusCardPro
               <motion.button
                 key={option.value}
                 type="button"
-                onClick={() => !isReadOnly && onChange(option.value)}
-                disabled={isReadOnly}
-                whileTap={isReadOnly ? {} : { scale: 0.96 }}
+                onClick={() => onChange(option.value)}
+                whileTap={{ scale: 0.96 }}
                 className={cn(
                   "relative flex items-center justify-center gap-2 rounded-2xl border-2 px-3 py-3 text-sm font-heading font-bold transition-colors",
-                  active ? option.activeClass : cn(option.colorClass, "hover:brightness-95"),
-                  isReadOnly && "cursor-not-allowed opacity-70"
+                  active ? option.activeClass : cn(option.colorClass, "hover:brightness-95")
                 )}
               >
                 <span className="text-lg">{option.emoji}</span>
