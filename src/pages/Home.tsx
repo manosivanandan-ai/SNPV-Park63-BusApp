@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useStudents } from "@/hooks/useStudents";
 import { useDriver } from "@/hooks/useDriver";
 import { useBusStatus } from "@/hooks/useBusStatus";
+import { useMarkingActivity } from "@/hooks/useMarkingActivity";
 import type { Phase } from "@/types";
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
     useStudents();
   const { driver, setDriver } = useDriver();
   const { status, setStatus } = useBusStatus();
+  const { activePhase } = useMarkingActivity();
 
   const [tab, setTab] = useState<Phase>("phase2");
   const [addOpen, setAddOpen] = useState(false);
@@ -88,14 +90,37 @@ export default function Home() {
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as Phase)} className="flex flex-col">
           <TabsList className="w-full">
-            <TabsTrigger value="phase2">Phase 2</TabsTrigger>
-            <TabsTrigger value="phase1">Phase 1</TabsTrigger>
+            <TabsTrigger value="phase2" className="gap-1.5">
+              Phase 2
+              {activePhase === "phase2" && (
+                <motion.span
+                  className="h-1.5 w-1.5 rounded-full bg-mint-500"
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity }}
+                  aria-label="Phase 2 attendance being marked now"
+                  title="Phase 2 attendance being marked now"
+                />
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="phase1" className="gap-1.5">
+              Phase 1
+              {activePhase === "phase1" && (
+                <motion.span
+                  className="h-1.5 w-1.5 rounded-full bg-mint-500"
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity }}
+                  aria-label="Phase 1 attendance being marked now"
+                  title="Phase 1 attendance being marked now"
+                />
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="phase2">
             <PhaseBoard
               phase="phase2"
               students={phase2Students}
+              busStatus={status}
               onToggleBoarded={toggleBoarded}
               onRename={renameStudent}
               onMove={moveStudent}
@@ -106,6 +131,7 @@ export default function Home() {
             <PhaseBoard
               phase="phase1"
               students={phase1Students}
+              busStatus={status}
               onToggleBoarded={toggleBoarded}
               onRename={renameStudent}
               onMove={moveStudent}

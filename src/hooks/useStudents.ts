@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { INITIAL_STUDENTS } from "@/data/initialData";
+import { pingMarkingActivity } from "@/hooks/useMarkingActivity";
 import type { Phase, Student } from "@/types";
 
 const REF = doc(db, "config", "students");
@@ -51,7 +52,9 @@ export function useStudents() {
 
   const toggleBoarded = useCallback(
     (id: string) => {
+      const student = ref.current.find((s) => s.id === id);
       persist(ref.current.map((s) => (s.id === id ? { ...s, boarded: !s.boarded } : s)));
+      if (student) pingMarkingActivity(student.phase);
     },
     [persist]
   );

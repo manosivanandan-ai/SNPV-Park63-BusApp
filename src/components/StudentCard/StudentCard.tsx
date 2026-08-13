@@ -30,13 +30,14 @@ function colorForName(name: string) {
 
 interface StudentCardProps {
   student: Student;
+  canMark: boolean;
   onToggleBoarded: (id: string) => void;
   onRename: (id: string, name: string) => void;
   onMove: (id: string, phase: Student["phase"]) => void;
   onDelete: (id: string) => void;
 }
 
-export function StudentCard({ student, onToggleBoarded, onRename, onMove, onDelete }: StudentCardProps) {
+export function StudentCard({ student, canMark, onToggleBoarded, onRename, onMove, onDelete }: StudentCardProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const otherPhase = student.phase === "phase1" ? "phase2" : "phase1";
@@ -76,6 +77,7 @@ export function StudentCard({ student, onToggleBoarded, onRename, onMove, onDele
                 size="sm"
                 variant={student.boarded ? "outline" : "mint"}
                 onClick={() => onToggleBoarded(student.id)}
+                disabled={!canMark}
                 className="whitespace-nowrap"
               >
                 {student.boarded ? (
