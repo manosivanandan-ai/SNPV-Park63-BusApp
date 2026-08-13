@@ -4,6 +4,7 @@ import { Lock, PartyPopper } from "lucide-react";
 import { SearchBar } from "@/components/SearchBar";
 import { StudentCard } from "@/components/StudentCard";
 import { Summary } from "@/components/Summary";
+import { Button } from "@/components/ui/button";
 import { fireConfetti } from "@/utils/confetti";
 import { PHASE_LABEL } from "@/data/initialData";
 import type { BusStatusValue, Phase, Student } from "@/types";
@@ -17,9 +18,19 @@ interface PhaseBoardProps {
   onRename: (id: string, name: string) => void;
   onMove: (id: string, phase: Phase) => void;
   onDelete: (id: string) => void;
+  onSetBusStatus: (status: BusStatusValue) => void;
 }
 
-export function PhaseBoard({ phase, students, busStatus, onToggleBoarded, onRename, onMove, onDelete }: PhaseBoardProps) {
+export function PhaseBoard({
+  phase,
+  students,
+  busStatus,
+  onToggleBoarded,
+  onRename,
+  onMove,
+  onDelete,
+  onSetBusStatus,
+}: PhaseBoardProps) {
   const canMark = busStatus === phase;
   const [query, setQuery] = useState("");
   const [flashedId, setFlashedId] = useState<string | null>(null);
@@ -58,9 +69,17 @@ export function PhaseBoard({ phase, students, busStatus, onToggleBoarded, onRena
       <Summary boarded={boardedCount} total={total} />
 
       {!canMark && (
-        <div className="flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-500">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-500">
           <Lock className="h-4 w-4 shrink-0" />
-          Marking opens once the bus is in {PHASE_LABEL[phase]}
+          <span className="flex-1">Marking opens once the bus is in {PHASE_LABEL[phase]}</span>
+          <Button
+            size="sm"
+            variant="outline"
+            className="shrink-0 whitespace-nowrap"
+            onClick={() => onSetBusStatus(phase)}
+          >
+            Bus is here — set {PHASE_LABEL[phase]}
+          </Button>
         </div>
       )}
 

@@ -125,6 +125,7 @@ export default function Home() {
               onRename={renameStudent}
               onMove={moveStudent}
               onDelete={deleteStudent}
+              onSetBusStatus={setStatus}
             />
           </TabsContent>
           <TabsContent value="phase1">
@@ -136,6 +137,7 @@ export default function Home() {
               onRename={renameStudent}
               onMove={moveStudent}
               onDelete={deleteStudent}
+              onSetBusStatus={setStatus}
             />
           </TabsContent>
         </Tabs>
