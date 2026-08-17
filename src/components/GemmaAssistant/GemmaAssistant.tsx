@@ -3,18 +3,38 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Bot, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGemmaChat } from "@/hooks/useGemmaChat";
-import type { Driver, BusStatusValue, Student } from "@/types";
+import type { Driver, BusStatusValue, Phase, Student } from "@/types";
 
 interface GemmaAssistantProps {
   students: Student[];
   status: BusStatusValue;
   driver: Driver;
+  defaultPhase: Phase;
+  onToggleBoarded: (id: string) => void;
+  onAddStudent: (name: string, phase: Phase) => void;
+  onRemoveStudent: (id: string) => void;
+  onSetStatus: (value: BusStatusValue) => void;
 }
 
-export function GemmaAssistant({ students, status, driver }: GemmaAssistantProps) {
+export function GemmaAssistant({
+  students,
+  status,
+  driver,
+  defaultPhase,
+  onToggleBoarded,
+  onAddStudent,
+  onRemoveStudent,
+  onSetStatus,
+}: GemmaAssistantProps) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const { messages, loading, error, send } = useGemmaChat(students, status, driver);
+  const { messages, loading, error, send } = useGemmaChat(students, status, driver, {
+    onToggleBoarded,
+    onAddStudent,
+    onRemoveStudent,
+    onSetStatus,
+    defaultPhase,
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,7 +76,7 @@ export function GemmaAssistant({ students, status, driver }: GemmaAssistantProps
             <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
               {messages.length === 0 && !loading && (
                 <p className="text-xs text-slate-400">
-                  Ask things like "who hasn't boarded yet?" or "how many kids are in phase 1?"
+                  Try "mark Aadhya as boarded", "add Priya to phase 1", "remove Bob", "set bus status to left", or ask a question about the roster.
                 </p>
               )}
               {messages.map((m, i) => (

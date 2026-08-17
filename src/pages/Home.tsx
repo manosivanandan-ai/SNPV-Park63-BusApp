@@ -164,7 +164,16 @@ export default function Home() {
 
       <ManageRosterDialog open={rosterOpen} onOpenChange={setRosterOpen} onImport={bulkImport} />
 
-      <GemmaAssistant students={students} status={status} driver={driver} />
+      <GemmaAssistant
+        students={students}
+        status={status}
+        driver={driver}
+        defaultPhase={tab}
+        onToggleBoarded={toggleBoarded}
+        onAddStudent={addStudent}
+        onRemoveStudent={deleteStudent}
+        onSetStatus={setStatus}
+      />
 
       <ConfirmDialog
         open={resetOpen}

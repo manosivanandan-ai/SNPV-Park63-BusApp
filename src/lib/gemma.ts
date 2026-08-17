@@ -13,6 +13,7 @@ export async function askGemma(systemContext: string, history: ChatMessage[]): P
     body: JSON.stringify({
       model: MODEL,
       messages: [{ role: "system", content: systemContext }, ...history],
+      format: "json",
       stream: false,
     }),
   });
