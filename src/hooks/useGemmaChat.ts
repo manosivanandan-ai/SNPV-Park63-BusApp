@@ -35,6 +35,7 @@ function buildContext(students: Student[], status: BusStatusValue, driver: Drive
     "- Use remove_student only when the user explicitly asks to remove/delete a student.",
     "- If the user names someone, copy their name exactly as given in the \"name\" field, even if that name is not in the roster below — the app will check it.",
     "- Use answer for questions that do not change data (counts, who has/hasn't boarded, roster lookups, etc).",
+    "- For answer, only ever mention names that appear verbatim in the roster list below. Never invent, guess, or reuse example names — if you are not sure, say you don't know.",
     "",
     "Examples:",
     'User: "Mark Aadhya as boarded" -> {"action":"mark_boarded","name":"Aadhya","boarded":true}',
@@ -42,7 +43,7 @@ function buildContext(students: Student[], status: BusStatusValue, driver: Drive
     'User: "Add a new student named Priya to phase 1" -> {"action":"add_student","name":"Priya","phase":"phase1"}',
     'User: "Remove Bob from the roster" -> {"action":"remove_student","name":"Bob"}',
     'User: "Set the bus status to left" -> {"action":"set_bus_status","status":"left"}',
-    'User: "Who has not boarded yet?" -> {"action":"answer","reply":"Bob and Carl have not boarded."}',
+    'User: "What color is the bus?" -> {"action":"answer","reply":"I don\'t have that information."}',
     "",
     `Bus status: ${status}.`,
     `Driver: ${driver.name} (${driver.phone}).`,
@@ -84,6 +85,52 @@ function busStatusLabel(value: BusStatusValue): string {
   return BUS_STATUS_OPTIONS.find((o) => o.value === value)?.label ?? value;
 }
 
+// Handles the most common factual questions directly from the real roster data,
+// so answers to them never depend on the model reading the list correctly.
+function localAnswer(students: Student[], rawQuery: string): string | null {
+  const q = rawQuery.toLowerCase();
+
+  const asksNotBoarded = /who\b.{0,20}(hasn'?t|haven'?t|has not|have not|isn'?t|is not|not)\b.{0,10}board/.test(q);
+  const asksBoarded = !asksNotBoarded && /who\b.{0,20}(has|have|is|are)\b.{0,10}board/.test(q);
+
+  if (asksNotBoarded) {
+    const names = students.filter((s) => !s.boarded).map((s) => s.name);
+    return names.length === 0 ? "Everyone has boarded." : `Not boarded: ${names.join(", ")}.`;
+  }
+  if (asksBoarded) {
+    const names = students.filter((s) => s.boarded).map((s) => s.name);
+    return names.length === 0 ? "No one has boarded yet." : `Boarded: ${names.join(", ")}.`;
+  }
+
+  if (/how many/.test(q)) {
+    const phase1 = students.filter((s) => s.phase === "phase1");
+    const phase2 = students.filter((s) => s.phase === "phase2");
+    const asksPhase1 = /phase\s*1/.test(q);
+    const asksPhase2 = /phase\s*2/.test(q);
+    const asksBoardedCount = /board/.test(q);
+
+    if (asksPhase1) {
+      return asksBoardedCount
+        ? `${phase1.filter((s) => s.boarded).length} of ${phase1.length} in Phase 1 have boarded.`
+        : `There are ${phase1.length} students in Phase 1.`;
+    }
+    if (asksPhase2) {
+      return asksBoardedCount
+        ? `${phase2.filter((s) => s.boarded).length} of ${phase2.length} in Phase 2 have boarded.`
+        : `There are ${phase2.length} students in Phase 2.`;
+    }
+    if (asksBoardedCount) {
+      const boarded = students.filter((s) => s.boarded).length;
+      return `${boarded} of ${students.length} students have boarded.`;
+    }
+    if (/(total|student|kid|child)/.test(q)) {
+      return `There are ${students.length} students total.`;
+    }
+  }
+
+  return null;
+}
+
 interface Actions {
   onToggleBoarded: (id: string) => void;
   onAddStudent: (name: string, phase: Phase) => void;
@@ -108,8 +155,15 @@ export function useGemmaChat(
       if (!trimmed || loading) return;
 
       setMessages((m) => [...m, { role: "user", content: trimmed }]);
-      setLoading(true);
       setError(null);
+
+      const direct = localAnswer(students, trimmed);
+      if (direct !== null) {
+        setMessages((m) => [...m, { role: "assistant", content: direct }]);
+        return;
+      }
+
+      setLoading(true);
 
       try {
         const context = buildContext(students, status, driver);
