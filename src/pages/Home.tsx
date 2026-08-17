@@ -8,6 +8,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { PhaseBoard } from "@/components/PhaseBoard";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import { ManageRosterDialog } from "@/components/ManageRosterDialog";
+import { GemmaAssistant } from "@/components/GemmaAssistant";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { useStudents } from "@/hooks/useStudents";
@@ -162,6 +163,10 @@ export default function Home() {
       <AddStudentDialog open={addOpen} onOpenChange={setAddOpen} defaultPhase={tab} onAdd={addStudent} />
 
       <ManageRosterDialog open={rosterOpen} onOpenChange={setRosterOpen} onImport={bulkImport} />
+
+      {import.meta.env.DEV && (
+        <GemmaAssistant students={students} status={status} driver={driver} />
+      )}
 
       <ConfirmDialog
         open={resetOpen}
