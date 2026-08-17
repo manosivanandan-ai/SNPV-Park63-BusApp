@@ -164,9 +164,7 @@ export default function Home() {
 
       <ManageRosterDialog open={rosterOpen} onOpenChange={setRosterOpen} onImport={bulkImport} />
 
-      {import.meta.env.DEV && (
-        <GemmaAssistant students={students} status={status} driver={driver} />
-      )}
+      <GemmaAssistant students={students} status={status} driver={driver} />
 
       <ConfirmDialog
         open={resetOpen}
