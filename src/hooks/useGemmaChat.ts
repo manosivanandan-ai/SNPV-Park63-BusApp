@@ -247,7 +247,7 @@ export function useGemmaChat(
 
         setMessages((m) => [...m, { role: "assistant", content: resultText }]);
       } catch {
-        setError("Couldn't reach Agent 63. Is Ollama running (ollama serve)?");
+        setError("Couldn't reach Agent 63. Please try again in a moment.");
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,4 @@
-const OLLAMA_URL = "http://localhost:11434/api/chat";
-const MODEL = "gemma3:4b";
+const GEMINI_ENDPOINT = "/.netlify/functions/gemini-chat";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -7,21 +6,16 @@ export interface ChatMessage {
 }
 
 export async function askGemma(systemContext: string, history: ChatMessage[]): Promise<string> {
-  const res = await fetch(OLLAMA_URL, {
+  const res = await fetch(GEMINI_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: "system", content: systemContext }, ...history],
-      format: "json",
-      stream: false,
-    }),
+    body: JSON.stringify({ systemContext, history }),
   });
 
   if (!res.ok) {
-    throw new Error(`Gemma request failed: ${res.status}`);
+    throw new Error(`Gemini request failed: ${res.status}`);
   }
 
   const data = await res.json();
-  return data.message.content as string;
+  return data.content as string;
 }
